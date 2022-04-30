@@ -17,7 +17,6 @@ function App() {
 
     ipcSend('new video', {
       url: values.m3u8,
-      saveLocation: './cdad'
     });
 
     // prevent memory leak
@@ -32,10 +31,15 @@ function App() {
     });
 
     ipcOnResponse('download status', (event, arg) => {
-      console.log(arg)
       setDownloadStatus(arg === 0 ? 'finished' : 'failed')
     });
-  }, [])
+  }, []);
+
+  const onCancel = () => {
+    ipcSend('cancel download', {
+      videoId: 'video1'
+    });
+  }
 
   return (
     <div className="App">
@@ -62,9 +66,17 @@ function App() {
 
 
       {downloadStatus === 'downloading' && (
-        <Tag icon={<SyncOutlined spin />} color="processing">
-          {downloadedSize}KB
-        </Tag>
+        <>
+          <Tag icon={<SyncOutlined spin />} color="processing">
+            {downloadedSize}KB
+          </Tag>
+          <Button 
+            onClick={onCancel}
+            htmlType="button" 
+            type="danger"
+            size='small'
+          >cancel</Button>
+        </>
       )}
 
       {downloadStatus === 'finished' && (
@@ -78,7 +90,6 @@ function App() {
           failed
         </Tag>
       )}
-      
     </div>
   );
 }

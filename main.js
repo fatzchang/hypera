@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const { spawn } = require('child_process');
 const path = require('path');
 const downloadList = {};
@@ -54,6 +54,14 @@ app.on('activate', function () {
 
 // ipc section
 ipcMain.on('new video', (event, info) => {
+    const filename = dialog.showSaveDialogSync(mainWindow, {
+        filters: [{
+            name: 'Movies',
+            extensions: ['mp4']
+        }]
+    })
+    console.log(filename);
+
     //TODO: File './cad.mp4' already exists. Overwrite? [y/N]
 
     const child_path = path.join(__dirname, 'ffmpeg/bin/ffmpeg.exe');
@@ -61,7 +69,7 @@ ipcMain.on('new video', (event, info) => {
         '-protocol_whitelist', 'file,http,https,tcp,tls,crypto',
         '-user_agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36',
         '-i', info.url,
-        '-c', 'copy', `${info.saveLocation}.mp4`
+        '-c', 'copy', filename
     ]);
     
     ffmpeg.stdout.setEncoding('utf-8');
@@ -106,5 +114,5 @@ ipcMain.on('new video', (event, info) => {
 })
 
 ipcMain.on('cancel download', (event, arg) => {
-    downloadList[arg.videoId].process.close();
+    downloadList[arg.videoId].process.kill('SIGINT');
 })
