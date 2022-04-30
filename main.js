@@ -1,8 +1,11 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const { spawn } = require('child_process');
 const path = require('path');
+const downloadList = {};
 
 let mainWindow;
+const sizeReg = new RegExp('([0-9]+)kB');
+const fileExistReg = new RegExp('\[y/N\]');
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -51,6 +54,8 @@ app.on('activate', function () {
 
 // ipc section
 ipcMain.on('new video', (event, info) => {
+    //TODO: File './cad.mp4' already exists. Overwrite? [y/N]
+
     const child_path = path.join(__dirname, 'ffmpeg/bin/ffmpeg.exe');
     const ffmpeg = spawn(child_path, [
         '-protocol_whitelist', 'file,http,https,tcp,tls,crypto',
@@ -58,17 +63,48 @@ ipcMain.on('new video', (event, info) => {
         '-i', info.url,
         '-c', 'copy', `${info.saveLocation}.mp4`
     ]);
-
-    ffmpeg.stdout.on('data', data => {
-        console.log(`stdout: ${data}`);
-    });
     
-    ffmpeg.stderr.on('data', data => {
-        console.log(`stderr: ${data}`);
-        event.reply('download status', data.toString());
+    ffmpeg.stdout.setEncoding('utf-8');
+
+    // TODO: generate an unique id for this download
+    const videoID = 'video1';
+
+    downloadList[videoID] = {
+        process: ffmpeg,
+        url: info.url,
+        saveLocation: info.saveLocation
+    }
+
+    event.reply('video download create', {
+        videoID: videoID,
+        saveLocation: info.saveLocation
     });
 
-    ffmpeg.on('close', (code) => {
+    // ffmpeg seems output everything to stderr
+    // downloadList[videoID].process.stdout.on('data', data => {
+    //     console.log(`stdout: ${data}`);
+    // });
+    
+    downloadList[videoID].process.stderr.on('data', data => {
+        // console.log(`stderr: ${data}`);
+        const match = data.toString().match(sizeReg);
+        if (match) {
+            event.reply('downloaded size', match[1]);
+        } else if (fileExistReg.test(data)) {
+            // overwrite the exist file
+            downloadList[videoID].process.stdin.write('y\n');
+        }
+    });
+
+    downloadList[videoID].process.on('close', (code) => {
         console.log(`ffmpeg closed with code ${code}`);
+        event.reply('download status', code);
+
+        // TODO: process
+        delete downloadList[videoID];
     })
+})
+
+ipcMain.on('cancel download', (event, arg) => {
+    downloadList[arg.videoId].process.close();
 })

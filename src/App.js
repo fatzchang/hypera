@@ -1,23 +1,23 @@
 import { Tag, Input, Button, Form } from 'antd';
 import {
   SyncOutlined,
-  CheckCircleOutlined
+  CheckCircleOutlined,
+  CloseCircleOutlined 
 } from '@ant-design/icons';
 import './App.css';
 import { useEffect, useState } from 'react';
+
 const { ipcSend, ipcOnResponse } = window.privilegeAPI;
 
-
-
-
-
 function App() {
-  const [downloadState, setDownloadState] = useState('finished');
+  const [downloadStatus, setDownloadStatus] = useState(null);
   const [downloadedSize, setDownloadedSize] = useState(0);
   const onFinish = (values) => {
+    setDownloadStatus('downloading');
+
     ipcSend('new video', {
       url: values.m3u8,
-      saveLocation: './cad'
+      saveLocation: './cdad'
     });
 
     // prevent memory leak
@@ -26,9 +26,14 @@ function App() {
   };
 
   useEffect(() => {
-    ipcOnResponse('download status', (event, arg) => {
-      setDownloadedSize(13);
+    ipcOnResponse('downloaded size', (event, arg) => {
+      setDownloadedSize(arg);
       // console.log(arg);
+    });
+
+    ipcOnResponse('download status', (event, arg) => {
+      console.log(arg)
+      setDownloadStatus(arg === 0 ? 'finished' : 'failed')
     });
   }, [])
 
@@ -50,19 +55,27 @@ function App() {
           <Button 
             htmlType="submit" 
             type="primary"
-            disabled={downloadState === 'downloading'}
+            disabled={downloadStatus === 'downloading'}
           >Submit</Button>
         </Form.Item>
       </Form>
-      {downloadState === 'downloading' && (
+
+
+      {downloadStatus === 'downloading' && (
         <Tag icon={<SyncOutlined spin />} color="processing">
           {downloadedSize}KB
         </Tag>
       )}
 
-      {downloadState === 'finished' && (
+      {downloadStatus === 'finished' && (
         <Tag icon={<CheckCircleOutlined />} color="success">
           finished
+        </Tag>
+      )}
+
+      {downloadStatus === 'failed' && (
+        <Tag icon={<CloseCircleOutlined  />} color="error">
+          failed
         </Tag>
       )}
       
