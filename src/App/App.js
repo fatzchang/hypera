@@ -20,18 +20,20 @@ function App() {
     ipcInvoke('new video', {
       url: values.m3u8,
     }).then((videoInfo) => {
-      const newList = [
-        ...downloadList, 
-        {
-          url: videoInfo.url,
-          filename: videoInfo.filename,
-          videoId: videoInfo.id,
-          status: 'downloading',
-          downloadedSize: 0
-        }
-      ];
-      console.log(newList)
-      setDownloadList(newList);
+      if (videoInfo) {
+        const newList = [
+          ...downloadList, 
+          {
+            url: videoInfo.url,
+            filename: videoInfo.filename,
+            videoId: videoInfo.id,
+            status: 'downloading',
+            downloadedSize: 0
+          }
+        ];
+        console.log(newList)
+        setDownloadList(newList);
+      }
     });
 
     // prevent memory leak

@@ -19,7 +19,7 @@ function DownloadList({ list, onCancel }) {
             <List.Item.Meta
               title={
                 <Text 
-                  style={{ with: 100 }} 
+                  style={{ with: 100, paddingRight: 10 }} 
                   ellipsis={{ tooltip: item.filename.replace(/^.*[\\\/]/, '') }}
                 >
                   {item.filename.replace(/^.*[\\\/]/, '')}

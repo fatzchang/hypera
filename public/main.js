@@ -6,11 +6,10 @@ const fs = require('fs');
 
 // prevent "Passthrough is not supported, GL is disabled" error
 app.disableHardwareAcceleration()
-
 const downloadList = {};
 let mainWindow;
 const sizeReg = new RegExp('([0-9]+)kB');
-const fileExistReg = new RegExp('\[y/N\]');
+const fileExistReg = new RegExp('Overwrite');
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -65,8 +64,11 @@ ipcMain.handle('new video', async (event, info) => {
       name: 'Movies',
       extensions: ['mp4']
     }]
-  })
-  
+  });
+
+  if (response.canceled) {
+    return null;
+  }
   const ffmpeg = spawn(ffmpegPath, [
     '-protocol_whitelist', 'file,http,https,tcp,tls,crypto',
     '-user_agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36',
