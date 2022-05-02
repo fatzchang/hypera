@@ -5,7 +5,9 @@ const path = require('path');
 const fs = require('fs');
 
 // prevent "Passthrough is not supported, GL is disabled" error
-app.disableHardwareAcceleration()
+app.disableHardwareAcceleration();
+app.setAsDefaultProtocolClient('video-downloader');
+
 const downloadList = {};
 let mainWindow;
 const sizeReg = new RegExp('([0-9]+)kB');
@@ -57,7 +59,12 @@ app.on('activate', function () {
 
 // ipc section
 ipcMain.handle('new video', async (event, info) => {
-  const ffmpegPath = path.resolve(__dirname, 'ffmpeg.exe');
+  let ffmpegPath;
+  if(process.env.ELECTRON_DEV_MODE){
+    ffmpegPath = path.join(__dirname, '../assets/ffmpeg.exe');
+  } else {
+    ffmpegPath = path.join(process.resourcesPath, "./assets/ffmpeg.exe");
+  }
 
   const response = await dialog.showSaveDialog(mainWindow, {
     filters: [{

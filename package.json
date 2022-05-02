@@ -53,8 +53,12 @@
       "build/**/*",
       "node_modules/**/*"
     ],
-    "directories": {
-      "buildResources": "assets"
+    "extraResources": "assets",
+    "protocols": {
+      "name": "video-downloader-protocol",
+      "schemes": [
+        "video-downloader"
+      ]
     }
   }
 }
