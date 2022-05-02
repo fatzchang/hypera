@@ -2,7 +2,8 @@
   "name": "video-downloader",
   "version": "0.1.0",
   "private": true,
-  "main": "main.js",
+  "author": "Fatz",
+  "main": "public/main.js",
   "homepage": "./",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -12,6 +13,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "5.0.1",
+    "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -20,7 +22,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron:dev": "set ELECTRON_DEV_MODE=1 && electron .",
-    "electron:prod": "electron ."
+    "electron:prod": "electron .",
+    "electron-pack": "electron-builder -c.extraMetadata.main=build/main.js"
   },
   "eslintConfig": {
     "extends": [
@@ -41,6 +44,17 @@
     ]
   },
   "devDependencies": {
-    "electron": "^18.1.0"
+    "electron": "^18.1.0",
+    "electron-builder": "^23.0.3"
+  },
+  "build": {
+    "appId": "com.app.video-downloader",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   }
 }
