@@ -99,7 +99,6 @@ function App() {
   return (
     <div className="App">
       <Layout style={{height: '100vh'}}>
-        {/* <Header>Header</Header> */}
         <Layout>
           <Content style={{padding: '30px'}}>
             <Form onFinish={onFinish}>

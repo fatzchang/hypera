@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { v4: uuidv4 } = require('uuid');
 const { spawn } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 // prevent "Passthrough is not supported, GL is disabled" error
 app.disableHardwareAcceleration()
@@ -65,8 +66,6 @@ ipcMain.handle('new video', async (event, info) => {
       extensions: ['mp4']
     }]
   })
-
-  // TODO: deal with cancel
   
   const ffmpeg = spawn(ffmpegPath, [
     '-protocol_whitelist', 'file,http,https,tcp,tls,crypto',
@@ -92,7 +91,7 @@ ipcMain.handle('new video', async (event, info) => {
   // });
 
   downloadList[videoId].process.stderr.on('data', data => {
-    console.log(`stderr: ${data}`);
+    console.log(`${downloadList[videoId].filename}: ${data}`);
     const match = data.toString().match(sizeReg);
     if (match) {
       
@@ -113,8 +112,17 @@ ipcMain.handle('new video', async (event, info) => {
       statusCode: code
     });
     
+    // remove file if not success
+    if (code !== 0) {
+      fs.unlink(downloadList[videoId].filename, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
+    
     delete downloadList[videoId];
-    console.log('ffmpeg closed')
+    console.log('ffmpeg closed');
   });
 
   return {
