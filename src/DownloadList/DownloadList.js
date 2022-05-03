@@ -32,30 +32,26 @@ function DownloadList({ list, onCancel }) {
                       {formatBytes(item.downloadedSize * 1024)}
                     </Tag>
                   )}
+                  {item.status === 'finished' && (
+                    <Tag icon={<CheckCircleOutlined />} color="success">
+                      finished
+                    </Tag>
+                  )}
+
+                  {item.status === 'failed' && (
+                    <Tag icon={<CloseCircleOutlined  />} color="error">
+                      failed
+                    </Tag>
+                  )}
                 </>
               }
-            />
-            <div>              
-              {item.status === 'finished' && (
-                <Tag icon={<CheckCircleOutlined />} color="success">
-                  finished
-                </Tag>
-              )}
-
-              {item.status === 'failed' && (
-                <Tag icon={<CloseCircleOutlined  />} color="error">
-                  failed
-                </Tag>
-              )}
-              
-              <Button 
-                onClick={onCancel.bind(null, item.videoId)}
-                htmlType="button" 
-                type="danger"
-                size='small'
-              >remove</Button>
-            
-            </div>
+            />  
+            <Button 
+              onClick={onCancel.bind(null, item.videoId)}
+              htmlType="button" 
+              type="danger"
+              size='small'
+            >remove</Button>
         </List.Item>
       )}
     />

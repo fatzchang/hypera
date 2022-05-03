@@ -1,9 +1,9 @@
-Hypera
-===
+# Hypera
+
 ## Description
 Hypera is a m3u8 stream video downloader, based on ffmpeg.  
   
-It can cooperate with Hypera Detector chrome extension to fetch the downloadable stream videos in web page.
+You can use Hypera with [Hypera Detector](https://www.google.com) chrome extension to capture the stream videos that is downloadable in currently opened web page.
 
 ## How to 
 ### Build app
