@@ -1,4 +1,5 @@
-import { Input, Button, Form, Layout } from 'antd';
+import { Input, Button, Form, Layout, Divider, Card, Row, Col, Space } from 'antd';
+import { ClearOutlined, DownloadOutlined, LoadingOutlined  } from '@ant-design/icons';
 import './App.css';
 import { useEffect, useState, useRef } from 'react';
 import DownloadList from '../DownloadList/DownloadList';
@@ -100,9 +101,9 @@ function App() {
 
   return (
     <div className="App">
-      <Layout style={{height: '100vh'}}>
+      <Layout style={{height: '100vh', minHeight: 741}}>
         <Layout>
-          <Content style={{padding: '30px'}}>
+          <Content width={592} style={{padding: '30px'}}>
             <Form onFinish={onFinish}>
               <Form.Item
                 label="M3U8 URL"
@@ -118,11 +119,35 @@ function App() {
                 <Button 
                   htmlType="submit" 
                   type="primary"
-                >Submit</Button>
+                  >
+                  <Space size={'middle'}>
+                    Fetch
+                    {/* <LoadingOutlined /> */}
+                  </Space>
+                </Button>
               </Form.Item>
             </Form>
+            <Divider />
+            {/* <Row gutter={16}>
+              <Col span={12}>
+                <Card
+                  bodyStyle={{display: 'none'}}
+                  cover={
+                    <img
+                      alt="example"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                    />
+                  }
+                  actions={[
+                    <DownloadOutlined />,
+                    <ClearOutlined />
+                  ]}
+                >
+                </Card>
+              </Col>
+            </Row> */}
           </Content>
-          <Sider width={400} style={{padding: '30px', overflow: 'hidden'}} theme='light'>
+          <Sider width={392} style={{padding: '30px', overflow: 'hidden'}} theme='light'>
             <DownloadList list={downloadList} onCancel={onCancel} />
           </Sider>
         </Layout>

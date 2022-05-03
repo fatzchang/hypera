@@ -1,5 +1,5 @@
 {
-  "name": "video-downloader",
+  "name": "hypera",
   "version": "0.1.0",
   "private": true,
   "author": "Fatz",
@@ -48,16 +48,16 @@
     "electron-builder": "^23.0.3"
   },
   "build": {
-    "appId": "com.app.video-downloader",
+    "appId": "com.app.hypera",
     "files": [
       "build/**/*",
       "node_modules/**/*"
     ],
     "extraResources": "assets",
     "protocols": {
-      "name": "video-downloader-protocol",
+      "name": "hypera-protocol",
       "schemes": [
-        "video-downloader"
+        "hypera"
       ]
     }
   }
