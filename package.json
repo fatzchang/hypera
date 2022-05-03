@@ -22,8 +22,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron:dev": "set ELECTRON_DEV_MODE=1 && electron .",
-    "electron:prod": "electron .",
-    "electron-pack": "electron-builder -c.extraMetadata.main=build/main.js"
+    "electron:pack": "electron-builder -c.extraMetadata.main=build/main.js"
   },
   "eslintConfig": {
     "extends": [
@@ -49,10 +48,6 @@
   },
   "build": {
     "appId": "com.app.hypera",
-    "files": [
-      "build/**/*",
-      "node_modules/**/*"
-    ],
     "extraResources": "assets",
     "protocols": {
       "name": "hypera-protocol",

@@ -5,3 +5,4 @@ ffmpeg -protocol_whitelist "file,http,https,tcp,tls,crypto" -user_agent "Mozilla
 create a temp folder to store the screenshot
 delete the temp folder on app exit
 websocket server
+get uuid per PC to add up users
