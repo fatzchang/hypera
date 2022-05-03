@@ -3,10 +3,12 @@ const { v4: uuidv4 } = require('uuid');
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const Websocket = require('ws');
+const wss = new Websocket.Server({ port: 49367 })
 
 // prevent "Passthrough is not supported, GL is disabled" error
 app.disableHardwareAcceleration();
-app.setAsDefaultProtocolClient('video-downloader');
+app.setAsDefaultProtocolClient('hypera');
 
 const downloadList = {};
 let mainWindow;
@@ -26,7 +28,7 @@ const createWindow = () => {
   if (process.env.ELECTRON_DEV_MODE) {
     mainWindow.loadURL('http://localhost:3000');
   } else {
-    mainWindow.loadFile(path.join(__dirname, 'index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../index.html'));
   }
   // mainWindow.webContents.openDevTools();
 
@@ -38,6 +40,14 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
   createWindow();
+
+  wss.on('connection', ws => {
+    console.log('a client has connected!');
+  
+    ws.on('close', function close() {
+      console.log('disconnected');
+    });
+  })
 })
 
 // Quit when all windows are closed.

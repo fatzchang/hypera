@@ -8,5 +8,38 @@
 </head>
 <body>
   <a href="hypera://">open in foobar</a>
+
+  <script>
+    var socket;
+		if (!window.WebSocket) {
+			window.WebSocket = window.MozWebSocket;
+		}
+		if (window.WebSocket) {
+			socket = new WebSocket("ws://localhost:49367/ws");
+			socket.onmessage = function (event) {
+				var ta = document.getElementById('responseText');
+				ta.value = ta.value + '\n' + event.data
+			};
+			socket.onopen = function (event) {
+        console.log('open!')
+			};
+			socket.onclose = function (event) {
+				console.log('closed!')
+			};
+		} else {
+			alert("你的浏览器不支持 WebSocket！");
+		}
+
+		function send(message) {
+			if (!window.WebSocket) {
+				return;
+			}
+			if (socket.readyState == WebSocket.OPEN) {
+				socket.send(message);
+			} else {
+				alert("连接没有开启.");
+			}
+		}
+  </script>
 </body>
 </html>
