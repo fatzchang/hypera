@@ -2,4 +2,8 @@
 
 body {
   margin: 0;
+  min-width: 984px;
+  min-height: 741px;
+  overflow-y: auto;
+  overflow-x: auto;
 }
