@@ -1,9 +1,10 @@
-import { Card, Row, Col, List, Typography } from 'antd';
-import { ClearOutlined, DownloadOutlined  } from '@ant-design/icons';
-const { Meta } = Card;
+import React from 'react';
+import { Button, List, Typography, Avatar } from 'antd';
+import { DownloadOutlined  } from '@ant-design/icons';
 const { Text } = Typography;
 
-function DetectedList({ list }) {
+
+function DetectedList({ list, onSubmit }) {
   return (
     <List
       itemLayout="vertical"
@@ -12,11 +13,12 @@ function DetectedList({ list }) {
       renderItem={item => (
         <List.Item
           key={item.uuid}
-          // actions={[
-          //   <IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-          //   <IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
-          //   <IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
-          // ]}
+          actions={[
+            <Button onClick={() => onSubmit(item.url)}>
+                <DownloadOutlined />
+                Download
+            </Button>
+          ]}
           extra={
             <img
               width={272}
@@ -26,12 +28,12 @@ function DetectedList({ list }) {
           }
         >
           <List.Item.Meta
-            // avatar={<Avatar src={item.avatar} />}
+            avatar={<Avatar src={`https://s2.googleusercontent.com/s2/favicons?domain_url=${item.initiator}`} />}
             title={
               <Text
                 ellipsis={{ tooltip: item.initiator }}
               >
-                {item.initiator}
+                From: {item.initiator}
               </Text>}
             description={
               <Text
@@ -45,33 +47,6 @@ function DetectedList({ list }) {
         </List.Item>
       )}
     />
-    // <div style={{width: 700}}>
-    //   <Row gutter={[16, 24]}>
-    //     {list.map((item) => (
-    //       <Col span={12} key={item.uuid}>
-    //         <Card
-    //           // bodyStyle={{display: 'none'}}
-    //           style={{width: 300}}
-    //           cover={
-    //             <img
-    //               alt="example"
-    //               src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-    //             />
-    //           }
-    //           actions={[
-    //             <DownloadOutlined />,
-    //             <ClearOutlined />
-    //           ]}
-    //         >
-    //           <Meta
-    //             title="Card title"
-    //             description={item.url}
-    //           />
-    //         </Card>
-    //       </Col>
-    //     ))}
-    //   </Row>
-    // </div>
   )
 }
 

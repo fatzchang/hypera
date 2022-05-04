@@ -24,9 +24,9 @@ function App() {
     videoDetected: null
   });
 
-  const onFinish = (values) => {
+  const submitNewVideo = (url) => {
     ipcInvoke('new video', {
-      url: values.m3u8,
+      url: url,
     }).then((videoInfo) => {
       if (videoInfo) {
         const newList = [
@@ -43,6 +43,10 @@ function App() {
         setDownloadList(newList);
       }
     });
+  }
+
+  const onFinish = (values) => {
+    submitNewVideo(values.m3u8)
 
     // prevent memory leak
     // https://stackoverflow.com/questions/69718631/electronjs-uncaught-typeerror-ipcrenderer-on-is-not-a-function
@@ -115,7 +119,7 @@ function App() {
 
     prevIpcKey.current['videoDetected'] = ipcOnResponse('video detected', (arg) => {
       const newDetectedList = [...detectedList];
-      newDetectedList.push(arg);
+      newDetectedList.unshift(arg);
       setDetectedList(newDetectedList)
       console.log(newDetectedList);
     });
@@ -150,14 +154,13 @@ function App() {
                     type="primary"
                     >
                     <Space size={'middle'}>
-                      Fetch
-                      {/* <LoadingOutlined /> */}
+                      Download Directly
                     </Space>
                   </Button>
                 </Form.Item>
               </Form>
               <Divider />
-              <DetectedList list={detectedList} />
+              <DetectedList list={detectedList} onSubmit={submitNewVideo} />
             </div>
           </Content>
           <Sider width={392} style={{padding: '30px', overflow: 'hidden'}} theme='light'>
