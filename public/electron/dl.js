@@ -14,7 +14,7 @@ const handleDownload = (mainWindow) => {
     if(process.env.ELECTRON_DEV_MODE){
       ffmpegPath = path.join(__dirname, '../../assets/ffmpeg.exe');
     } else {
-      ffmpegPath = path.join(process.resourcesPath, "../assets/ffmpeg.exe");
+      ffmpegPath = path.join(process.resourcesPath, "./assets/ffmpeg.exe");
     }
   
     const response = await dialog.showSaveDialog(mainWindow, {
