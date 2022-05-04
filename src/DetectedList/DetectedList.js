@@ -14,7 +14,10 @@ function DetectedList({ list, onSubmit }) {
         <List.Item
           key={item.uuid}
           actions={[
-            <Button onClick={() => onSubmit(item.url)}>
+            <Button onClick={() => onSubmit(item.url, item.headers.map((header) => {
+                return `${header.name}: ${header.value}`;
+              }).join('\r\n'))}
+            >
                 <DownloadOutlined />
                 Download
             </Button>

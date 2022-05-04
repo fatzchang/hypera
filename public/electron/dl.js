@@ -27,9 +27,11 @@ const handleDownload = (mainWindow) => {
     if (response.canceled) {
       return null;
     }
+
     const ffmpeg = spawn(ffmpegPath, [
       '-protocol_whitelist', 'file,http,https,tcp,tls,crypto',
       '-user_agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36',
+      '-headers', info.headers,
       '-i', info.url,
       '-c', 'copy', response.filePath
     ]);

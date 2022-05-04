@@ -24,9 +24,10 @@ function App() {
     videoDetected: null
   });
 
-  const submitNewVideo = (url) => {
+  const submitNewVideo = (url, headers = []) => {
     ipcInvoke('new video', {
       url: url,
+      headers
     }).then((videoInfo) => {
       if (videoInfo) {
         const newList = [
@@ -39,7 +40,7 @@ function App() {
             downloadedSize: 0
           }
         ];
-        console.log(newList)
+
         setDownloadList(newList);
       }
     });
