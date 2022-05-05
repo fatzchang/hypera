@@ -4,9 +4,9 @@ const Websocket = require('ws');
 const { getScreenshot } = require('./dl');
 const { v4: uuidv4 } = require('uuid');
 
-const wss = new Websocket.Server({ port: 49367 });
-
 const handleWebSocket = (app, mainWindow) => {
+  const wss = new Websocket.Server({ port: 49367 });
+  
   const tempDir = app.getPath('temp');
   wss.on('connection', ws => {
     console.log('a client has connected!');
