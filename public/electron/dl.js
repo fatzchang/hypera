@@ -45,6 +45,25 @@ const fullDownload = (args) => {
   return ffmpeg;
 }
 
+const getScreenshot = (args) => {
+  const ffmpegPath = getExecutablePath();
+  const { filename, url, headers } = args;
+
+  const ffmpeg = spawn(ffmpegPath, [
+    '-protocol_whitelist', 'file,http,https,tcp,tls,crypto',
+    '-headers', headers,
+    '-i', url,
+    '-ss', '10',
+    '-frames:v', '1' ,
+    '-q:v', '2', 
+    filename
+  ]);
+
+  ffmpeg.stdout.setEncoding('utf-8');
+
+  return ffmpeg;
+}
+
 const handleDownload = (renderer) => {
   const downloadList = {};
 
@@ -120,4 +139,4 @@ const handleDownload = (renderer) => {
   })
 }
 
-module.exports = { handleDownload };
+module.exports = { handleDownload, getScreenshot };

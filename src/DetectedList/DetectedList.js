@@ -3,7 +3,6 @@ import { Button, List, Typography, Avatar } from 'antd';
 import { DownloadOutlined  } from '@ant-design/icons';
 const { Text } = Typography;
 
-
 function DetectedList({ list, onSubmit }) {
   return (
     <List
@@ -26,7 +25,7 @@ function DetectedList({ list, onSubmit }) {
             <img
               width={272}
               alt="logo"
-              src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+              src={item.image}
             />
           }
         >

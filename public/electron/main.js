@@ -51,8 +51,7 @@ if (!gotTheLock) {
   app.whenReady().then(() => {
     createWindow();
     handleDownload(mainWindow);
-    handleWebSocket(mainWindow);
-    
+    handleWebSocket(app, mainWindow);
   })
   
   // Quit when all windows are closed.
