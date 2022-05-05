@@ -1,5 +1,5 @@
 import { Input, Button, Form, Layout, Divider, Space, message } from 'antd';
-import './App.css';
+import styles from './App.module.css';
 import { useEffect, useState, useRef } from 'react';
 import DownloadList from '../DownloadList/DownloadList';
 import DetectedList from '../DetectedList/DetectedList';
@@ -145,13 +145,7 @@ function App() {
       <Layout>
         <Layout>
           <Content>
-            <div style={{
-                padding: '30px', 
-                backgroundColor: 'white', 
-                minHeight: 741,
-                height: '100vh',
-                overflowY: 'auto'
-              }}>
+            <div className={styles.content}>
               <Form onFinish={onFinish}>
                 <Form.Item
                   label="M3U8 URL"
@@ -159,15 +153,13 @@ function App() {
                   initialValue=''
                   rules={[{ required: true, message: 'Please input m3u8 url!', }]}
                 >
-                  <Input
-                    style={{ width: '400px' }} 
-                  />
+                  <Input className={styles.url} />
                 </Form.Item>
                 <Form.Item>
                   <Button 
                     htmlType="submit" 
                     type="primary"
-                    >
+                  >
                     <Space size={'middle'}>
                       Download Directly
                     </Space>
@@ -178,7 +170,7 @@ function App() {
               <DetectedList list={detectedList} onSubmit={submitNewVideo} />
             </div>
           </Content>
-          <Sider width={392} style={{padding: '30px', overflow: 'hidden'}} theme='light'>
+          <Sider width={392} className={styles.sider} theme='light'>
             <DownloadList list={downloadList} onCancel={onCancel} />
           </Sider>
         </Layout>

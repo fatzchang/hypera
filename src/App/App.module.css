@@ -1,0 +1,20 @@
+.App {
+  
+}
+
+.content {
+  padding: 30px;
+  background-color: white;
+  min-height: 741px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.url {
+  width: 480px;
+}
+
+.sider {
+  padding: 30px;
+  overflow: hidden;
+}
