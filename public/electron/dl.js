@@ -134,7 +134,8 @@ const handleDownload = (renderer) => {
 
   ipcMain.on('cancel download', (event, arg) => {
     if (downloadList[arg.videoId]) {
-      downloadList[arg.videoId].process.kill('SIGINT');
+      // send q to stop download gracefully
+      downloadList[arg.videoId].process.stdin.write('q\n');
     }
   })
 }
