@@ -6,9 +6,11 @@ const wss = new Websocket.Server({ port: 49367 });
 const handleWebSocket = (mainWindow) => {
   wss.on('connection', ws => {
     console.log('a client has connected!');
+    mainWindow.webContents.send('ws connected');
   
     ws.on('close', () => {
       console.log('disconnected');
+      mainWindow.webContents.send('ws disconnected');
     });
 
     ws.on('message', (dataString) => {

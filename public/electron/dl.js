@@ -90,7 +90,7 @@ const handleDownload = (mainWindow) => {
     return {
       url: info.url,
       filename: response.filePath,
-      id: videoId
+      videoId: videoId
     }
   });
   

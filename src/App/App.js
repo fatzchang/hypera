@@ -1,5 +1,4 @@
-import { Input, Button, Form, Layout, Divider, Card, Row, Col, Space } from 'antd';
-import { ClearOutlined, DownloadOutlined, LoadingOutlined  } from '@ant-design/icons';
+import { Input, Button, Form, Layout, Divider, Space, message } from 'antd';
 import './App.css';
 import { useEffect, useState, useRef } from 'react';
 import DownloadList from '../DownloadList/DownloadList';
@@ -29,17 +28,14 @@ function App() {
       url: url,
       headers
     }).then((videoInfo) => {
+      // could be null if user cancele at location select dialog
       if (videoInfo) {
-        const newList = [
-          ...downloadList, 
-          {
-            url: videoInfo.url,
-            filename: videoInfo.filename,
-            videoId: videoInfo.id,
-            status: 'downloading',
-            downloadedSize: 0
-          }
-        ];
+        const newList = [...downloadList]
+        newList.push({
+          ...videoInfo,
+          status: 'downloading',
+          downloadedSize: 0
+        });
 
         setDownloadList(newList);
       }
@@ -69,7 +65,7 @@ function App() {
     setDownloadList(newList);  
   }
 
-
+  // handle download list at right side
   useEffect(() => {
     if (prevDownloadList.current.length !== downloadList.length) {
       if (
@@ -125,6 +121,24 @@ function App() {
       console.log(newDetectedList);
     });
   }, [detectedList]);
+
+  // handle ws client connect message
+  useEffect(() => {
+    console.log('restrict mode will render app twice!');
+
+    let connectKey = ipcOnResponse('ws connected', () => {
+      message.success('A client has connected!');
+    });
+
+    let disconnectKey = ipcOnResponse('ws disconnected', () => {
+      message.info('A client has disconnected!');
+    });
+
+    return () => {
+      ipcRemoveHandler('ws connected', connectKey);
+      ipcRemoveHandler('ws disconnected', disconnectKey);
+    }
+  }, []);
 
   return (
     <div className="App">
