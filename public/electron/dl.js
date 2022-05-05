@@ -6,95 +6,113 @@ const { v4: uuidv4 } = require('uuid');
 const sizeReg = new RegExp('([0-9]+)kB');
 const fileExistReg = new RegExp('Overwrite');
 
-const handleDownload = (mainWindow) => {
+const getExecutablePath = () => {
+  let execPath;
+  if (process.env.ELECTRON_DEV_MODE) {
+    execPath = path.join(__dirname, '../../assets/ffmpeg.exe');
+  } else {
+    execPath = path.join(process.resourcesPath, "./assets/ffmpeg.exe");
+  }
+
+  return execPath;
+}
+
+const askSaveLocation = async (renderer) => {
+  const response = await dialog.showSaveDialog(renderer, {
+    filters: [{
+      name: 'Movies',
+      extensions: ['mp4']
+    }]
+  });
+
+  return response.canceled ? null : response.filePath;
+}
+
+const fullDownload = (args) => {
+  const ffmpegPath = getExecutablePath();
+  const { filename, url, headers } = args;
+
+  const ffmpeg = spawn(ffmpegPath, [
+    '-protocol_whitelist', 'file,http,https,tcp,tls,crypto',
+    '-user_agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36',
+    '-headers', headers,
+    '-i', url,
+    '-c', 'copy', filename
+  ]);
+
+  ffmpeg.stdout.setEncoding('utf-8');
+
+  return ffmpeg;
+}
+
+const handleDownload = (renderer) => {
   const downloadList = {};
 
   ipcMain.handle('new video', async (event, info) => {
-    let ffmpegPath;
-    if(process.env.ELECTRON_DEV_MODE){
-      ffmpegPath = path.join(__dirname, '../../assets/ffmpeg.exe');
-    } else {
-      ffmpegPath = path.join(process.resourcesPath, "./assets/ffmpeg.exe");
-    }
-  
-    const response = await dialog.showSaveDialog(mainWindow, {
-      filters: [{
-        name: 'Movies',
-        extensions: ['mp4']
-      }]
-    });
-  
-    if (response.canceled) {
+    const filename = await askSaveLocation(renderer);
+    if (!filename) {
       return null;
     }
 
-    const ffmpeg = spawn(ffmpegPath, [
-      '-protocol_whitelist', 'file,http,https,tcp,tls,crypto',
-      '-user_agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36',
-      '-headers', info.headers,
-      '-i', info.url,
-      '-c', 'copy', response.filePath
-    ]);
-  
-    ffmpeg.stdout.setEncoding('utf-8');
-  
     // generate an unique id for this download
     const videoId = uuidv4();
-  
-    downloadList[videoId] = {
-      process: ffmpeg,
+    const downloadProcess = fullDownload({
+      filename,
       url: info.url,
-      filename: response.filePath
+      headers: info.headers
+    });
+
+    downloadList[videoId] = {
+      process: downloadProcess,
+      url: info.url,
+      filename: filename
     }
-  
+
     // ffmpeg seems output everything to stderr
-    // downloadList[videoId].process.stdout.on('data', data => {
-    //     console.log(`stdout: ${data}`);
-    // });
-  
-    downloadList[videoId].process.stderr.on('data', data => {
-      console.log(`${downloadList[videoId].filename}: ${data}`);
+    downloadProcess.stderr.on('data', data => {
+      // get download size information and send to renderer process
       const match = data.toString().match(sizeReg);
       if (match) {
-        
-        mainWindow.webContents.send('downloaded size', {
-          videoId: videoId,
+        renderer.webContents.send('downloaded size', {
+          videoId,
           downloadedSize: parseInt(match[1])
         });
-  
-      } else if (fileExistReg.test(data)) {
-        // overwrite the exist file
-        downloadList[videoId].process.stdin.write('y\n');
+      }
+
+      // overwrite the exist file [y/N]
+      if (fileExistReg.test(data)) {
+        downloadProcess.stdin.write('y\n');
       }
     });
-  
-    downloadList[videoId].process.on('close', (code) => {
-      mainWindow.webContents.send('download status', {
-        videoId: videoId,
-        statusCode: code
+
+    downloadProcess.on('close', (statusCode) => {
+      renderer.webContents.send('download status', {
+        videoId,
+        statusCode
       });
-      
+
       // remove file if not success
-      if (code !== 0) {
-        fs.unlink(downloadList[videoId].filename, (err) => {
+      if (statusCode !== 0) {
+        fs.unlink(filename, (err) => {
           if (err) {
             console.log(err);
           }
         });
       }
-      
+
       delete downloadList[videoId];
       console.log('ffmpeg closed');
     });
-  
+
+    // return from new video request
     return {
       url: info.url,
-      filename: response.filePath,
+      filename: filename,
       videoId: videoId
     }
   });
-  
-  
+
+
   ipcMain.on('cancel download', (event, arg) => {
     if (downloadList[arg.videoId]) {
       downloadList[arg.videoId].process.kill('SIGINT');
