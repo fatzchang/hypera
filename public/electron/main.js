@@ -1,7 +1,12 @@
+const { machineId } = require('node-machine-id');
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { handleDownload } = require('./dl');
 const { handleWebSocket } = require('./ws');
+
+machineId().then((id) => {
+  // use this id to differentiate user
+})
 
 let mainWindow;
 
