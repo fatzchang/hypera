@@ -26,7 +26,7 @@
     "eject": "react-scripts eject",
     "electron:dev": "set ELECTRON_DEV_MODE=1 && electron .",
     "electron:pack": "electron-builder -c.extraMetadata.main=build/electron/main.js",
-    "electron:release": "electron-builder -w -p 'onTagOrDraft'"
+    "electron:release": "electron-builder -c.extraMetadata.main=build/electron/main.js -w -p onTagOrDraft"
   },
   "eslintConfig": {
     "extends": [
