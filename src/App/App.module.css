@@ -8,6 +8,7 @@
   min-height: 741px;
   height: 100vh;
   overflow-y: auto;
+  background-color: #F9EBC8;
 }
 
 .url {
@@ -17,4 +18,6 @@
 .sider {
   padding: 30px;
   overflow: hidden;
+  background-color: #FEFBE7;
+  border-left: 2px dashed #A0BCC2;
 }

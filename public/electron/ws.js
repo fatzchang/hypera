@@ -18,8 +18,14 @@ const handleWebSocket = (app, mainWindow) => {
     });
 
     ws.on('message', (dataString) => {
-      const data = JSON.parse(dataString);
+      // keep connection alive
+      if (dataString.toString() === 'ping') {
+        ws.send('pong');
+        return;
+      }
 
+      // handle request from hypera detector
+      const data = JSON.parse(dataString);
       const filename = path.join(tempDir, `${uuidv4()}.jpg`);
       const headers = data.requestHeaders.map((header) => {
         return `${header.name}: ${header.value}`;
@@ -40,7 +46,8 @@ const handleWebSocket = (app, mainWindow) => {
               headers: data.requestHeaders,
               url: data.url,
               initiator: data.initiator,
-              image: image.toDataURL()
+              image: image.toDataURL(),
+              time: (new Date()).toLocaleTimeString()
             });
           }
 

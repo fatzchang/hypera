@@ -9,7 +9,7 @@ const {
   ipcSend, 
   ipcInvoke, 
   ipcOnResponse, 
-  ipcRemoveHandler 
+  ipcRemoveHandler
 } = window.privilegeAPI;
 
 function App() {
@@ -40,6 +40,10 @@ function App() {
         setDownloadList(newList);
       }
     });
+  }
+
+  const clearDetectedList = () => {
+    setDetectedList([]);
   }
 
   const onFinish = (values) => {
@@ -91,7 +95,7 @@ function App() {
       });
 
       prevIpcKey.current['downloadStatus'] = ipcOnResponse('download status', (arg) => {
-        console.log(arg);
+        // console.log(arg);
         const newList = [...downloadList];
         const downloadItem = newList.find(item => {
           return item.videoId === arg.videoId;
@@ -115,10 +119,11 @@ function App() {
     }
 
     prevIpcKey.current['videoDetected'] = ipcOnResponse('video detected', (arg) => {
+      console.log(arg);
       const newDetectedList = [...detectedList];
       newDetectedList.unshift(arg);
       setDetectedList(newDetectedList)
-      console.log(newDetectedList);
+      // console.log(newDetectedList);
     });
   }, [detectedList]);
 
@@ -167,7 +172,11 @@ function App() {
                 </Form.Item>
               </Form>
               <Divider />
-              <DetectedList list={detectedList} onSubmit={submitNewVideo} />
+              <DetectedList 
+                list={detectedList} 
+                onSubmit={submitNewVideo} 
+                onClear={clearDetectedList}
+              />
             </div>
           </Content>
           <Sider width={392} className={styles.sider} theme='light'>
