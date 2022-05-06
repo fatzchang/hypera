@@ -1,20 +1,23 @@
 {
   "name": "hypera",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "author": "Fatz",
-  "main": "public/main.js",
+  "main": "public/electron/main.js",
+  "repository": "git@github.com:fatzchang/hypera.git",
   "homepage": "./",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.1.1",
     "@testing-library/user-event": "^13.5.0",
     "antd": "^4.20.0",
+    "node-machine-id": "^1.1.12",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "5.0.1",
     "uuid": "^8.3.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "ws": "^8.6.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -22,8 +25,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron:dev": "set ELECTRON_DEV_MODE=1 && electron .",
-    "electron:prod": "electron .",
-    "electron-pack": "electron-builder -c.extraMetadata.main=build/main.js"
+    "electron:pack": "electron-builder -c.extraMetadata.main=build/electron/main.js",
+    "electron:release": "electron-builder -w -p 'onTagOrDraft'"
   },
   "eslintConfig": {
     "extends": [
@@ -49,16 +52,13 @@
   },
   "build": {
     "appId": "com.app.hypera",
-    "files": [
-      "build/**/*",
-      "node_modules/**/*"
-    ],
     "extraResources": "assets",
     "protocols": {
       "name": "hypera-protocol",
-      "schemes": [
-        "hypera"
-      ]
+      "schemes": ["hypera"]
+    },
+    "publish": {
+      "provider": "github"
     }
   }
 }

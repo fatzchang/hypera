@@ -1,41 +1,53 @@
-import { Input, Button, Form, Layout, Divider, Card, Row, Col, Space } from 'antd';
-import { ClearOutlined, DownloadOutlined, LoadingOutlined  } from '@ant-design/icons';
-import './App.css';
+import { Input, Button, Form, Layout, Divider, Space, message } from 'antd';
+import styles from './App.module.css';
 import { useEffect, useState, useRef } from 'react';
 import DownloadList from '../DownloadList/DownloadList';
+import DetectedList from '../DetectedList/DetectedList';
+
 const { Sider, Content } = Layout;
 const { 
   ipcSend, 
   ipcInvoke, 
   ipcOnResponse, 
-  ipcRemoveHandler 
+  ipcRemoveHandler
 } = window.privilegeAPI;
 
 function App() {
   const [downloadList, setDownloadList] = useState([]);
+  const [detectedList, setDetectedList] = useState([]);
   
   const prevDownloadList = useRef(downloadList);
-  const prevIpcKey = useRef([null, null]);
+  const prevIpcKey = useRef({
+    downloadedSize: null,
+    downloadStatus: null,
+    videoDetected: null
+  });
 
-  const onFinish = (values) => {
+  const submitNewVideo = (url, headers = []) => {
     ipcInvoke('new video', {
-      url: values.m3u8,
+      url: url,
+      headers
     }).then((videoInfo) => {
+      // could be null if user cancele at location select dialog
       if (videoInfo) {
-        const newList = [
-          ...downloadList, 
-          {
-            url: videoInfo.url,
-            filename: videoInfo.filename,
-            videoId: videoInfo.id,
-            status: 'downloading',
-            downloadedSize: 0
-          }
-        ];
-        console.log(newList)
+        const newList = [...downloadList]
+        newList.push({
+          ...videoInfo,
+          status: 'downloading',
+          downloadedSize: 0
+        });
+
         setDownloadList(newList);
       }
     });
+  }
+
+  const clearDetectedList = () => {
+    setDetectedList([]);
+  }
+
+  const onFinish = (values) => {
+    submitNewVideo(values.m3u8)
 
     // prevent memory leak
     // https://stackoverflow.com/questions/69718631/electronjs-uncaught-typeerror-ipcrenderer-on-is-not-a-function
@@ -57,15 +69,18 @@ function App() {
     setDownloadList(newList);  
   }
 
-
+  // handle download list at right side
   useEffect(() => {
     if (prevDownloadList.current.length !== downloadList.length) {
-      if (prevIpcKey.current[0] && prevIpcKey.current[1]) {
-        ipcRemoveHandler('downloaded size', prevIpcKey.current[0]);
-        ipcRemoveHandler('download status', prevIpcKey.current[1]);
+      if (
+        prevIpcKey.current['downloadedSize'] && 
+        prevIpcKey.current['downloadStatus']
+      ) {
+        ipcRemoveHandler('downloaded size', prevIpcKey.current['downloadedSize']);
+        ipcRemoveHandler('download status', prevIpcKey.current['downloadStatus']);
       }
 
-      prevIpcKey.current[0] = ipcOnResponse('downloaded size', (arg) => {
+      prevIpcKey.current['downloadedSize'] = ipcOnResponse('downloaded size', (arg) => {
         // console.log('download size triggered', arg.videoId)
         const newList = [...downloadList];
         const downloadItem = newList.find(item => {
@@ -79,8 +94,8 @@ function App() {
         
       });
 
-      prevIpcKey.current[1] = ipcOnResponse('download status', (arg) => {
-        console.log(arg);
+      prevIpcKey.current['downloadStatus'] = ipcOnResponse('download status', (arg) => {
+        // console.log(arg);
         const newList = [...downloadList];
         const downloadItem = newList.find(item => {
           return item.videoId === arg.videoId;
@@ -97,57 +112,74 @@ function App() {
 
   }, [downloadList]);
 
+  // handle video detect request from hypera detector
+  useEffect(() => {
+    if (prevIpcKey.current['videoDetected']) {
+      ipcRemoveHandler('video detected', prevIpcKey.current['videoDetected']);
+    }
 
+    prevIpcKey.current['videoDetected'] = ipcOnResponse('video detected', (arg) => {
+      console.log(arg);
+      const newDetectedList = [...detectedList];
+      newDetectedList.unshift(arg);
+      setDetectedList(newDetectedList)
+      // console.log(newDetectedList);
+    });
+  }, [detectedList]);
+
+  // handle ws client connect message
+  useEffect(() => {
+    console.log('restrict mode will render app twice!');
+
+    let connectKey = ipcOnResponse('ws connected', () => {
+      message.success('A client has connected!');
+    });
+
+    let disconnectKey = ipcOnResponse('ws disconnected', () => {
+      message.info('A client has disconnected!');
+    });
+
+    return () => {
+      ipcRemoveHandler('ws connected', connectKey);
+      ipcRemoveHandler('ws disconnected', disconnectKey);
+    }
+  }, []);
 
   return (
     <div className="App">
-      <Layout style={{height: '100vh', minHeight: 741}}>
+      <Layout>
         <Layout>
-          <Content width={592} style={{padding: '30px'}}>
-            <Form onFinish={onFinish}>
-              <Form.Item
-                label="M3U8 URL"
-                name="m3u8"
-                initialValue=''
-                rules={[{ required: true, message: 'Please input m3u8 url!', }]}
-              >
-                <Input
-                  style={{ width: '400px' }} 
-                />
-              </Form.Item>
-              <Form.Item>
-                <Button 
-                  htmlType="submit" 
-                  type="primary"
-                  >
-                  <Space size={'middle'}>
-                    Fetch
-                    {/* <LoadingOutlined /> */}
-                  </Space>
-                </Button>
-              </Form.Item>
-            </Form>
-            <Divider />
-            {/* <Row gutter={16}>
-              <Col span={12}>
-                <Card
-                  bodyStyle={{display: 'none'}}
-                  cover={
-                    <img
-                      alt="example"
-                      src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                    />
-                  }
-                  actions={[
-                    <DownloadOutlined />,
-                    <ClearOutlined />
-                  ]}
+          <Content>
+            <div className={styles.content}>
+              <Form onFinish={onFinish}>
+                <Form.Item
+                  label="M3U8 URL"
+                  name="m3u8"
+                  initialValue=''
+                  rules={[{ required: true, message: 'Please input m3u8 url!', }]}
                 >
-                </Card>
-              </Col>
-            </Row> */}
+                  <Input className={styles.url} />
+                </Form.Item>
+                <Form.Item>
+                  <Button 
+                    htmlType="submit" 
+                    type="primary"
+                  >
+                    <Space size={'middle'}>
+                      Download Directly
+                    </Space>
+                  </Button>
+                </Form.Item>
+              </Form>
+              <Divider />
+              <DetectedList 
+                list={detectedList} 
+                onSubmit={submitNewVideo} 
+                onClear={clearDetectedList}
+              />
+            </div>
           </Content>
-          <Sider width={392} style={{padding: '30px', overflow: 'hidden'}} theme='light'>
+          <Sider width={392} className={styles.sider} theme='light'>
             <DownloadList list={downloadList} onCancel={onCancel} />
           </Sider>
         </Layout>

@@ -1,63 +1,17 @@
-import { Tag, Button, List, Typography } from 'antd';
-import {
-  SyncOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined 
-} from '@ant-design/icons';
-import { formatBytes } from '../utils/format';
-
-const { Text } = Typography;
+import { List } from 'antd';
+import ListItem from './ListItem';
 
 function DownloadList({ list, onCancel }) {
+  if (list.length <= 0) {
+    return null;
+  }
+
   return (
     <List 
-    size='small'
+      size='small'
       bordered
       dataSource={list}
-      renderItem={item => (
-        <List.Item key={item.videoId}>
-            <List.Item.Meta
-              title={
-                <Text 
-                  style={{ with: 100, paddingRight: 10 }} 
-                  ellipsis={{ tooltip: item.filename.replace(/^.*[\\\/]/, '') }}
-                >
-                  {item.filename.replace(/^.*[\\\/]/, '')}
-                </Text>
-              }
-              description={
-                <>
-                  {item.status === 'downloading' && (
-                    <Tag icon={<SyncOutlined spin />} color="processing">
-                      {formatBytes(item.downloadedSize * 1024)}
-                    </Tag>
-                  )}
-                </>
-              }
-            />
-            <div>              
-              {item.status === 'finished' && (
-                <Tag icon={<CheckCircleOutlined />} color="success">
-                  finished
-                </Tag>
-              )}
-
-              {item.status === 'failed' && (
-                <Tag icon={<CloseCircleOutlined  />} color="error">
-                  failed
-                </Tag>
-              )}
-              
-              <Button 
-                onClick={onCancel.bind(null, item.videoId)}
-                htmlType="button" 
-                type="danger"
-                size='small'
-              >remove</Button>
-            
-            </div>
-        </List.Item>
-      )}
+      renderItem={item => <ListItem item={item} onCancel={onCancel} />}
     />
   )
 }
