@@ -26,3 +26,6 @@ npm start
 # execute electron with development env variable
 npm run electron:dev
 ```
+
+### Todo
+- Create a queue for each connection, prevent creating too many download rocesses

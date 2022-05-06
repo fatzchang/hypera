@@ -1,5 +1,0 @@
-[screenshot] skip 10 seconds (-ss)
-ffmpeg -protocol_whitelist "file,http,https,tcp,tls,crypto" -user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36" -i https://outo-apa.alonestreaming.com/hls/u_6IGP4KLc-llWHZJiTtJA/1651555731/20000/20572/20572.m3u8 -ss 10 -frames:v 1 -q:v 2 output.jpg 
-
-[TODO]
-get uuid per PC to add up users

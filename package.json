@@ -1,9 +1,10 @@
 {
   "name": "hypera",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "author": "Fatz",
   "main": "public/electron/main.js",
+  "repository": "git@github.com:fatzchang/hypera.git",
   "homepage": "./",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -24,7 +25,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron:dev": "set ELECTRON_DEV_MODE=1 && electron .",
-    "electron:pack": "electron-builder -c.extraMetadata.main=build/electron/main.js"
+    "electron:pack": "electron-builder -c.extraMetadata.main=build/electron/main.js",
+    "electron:release": "electron-builder -w -p 'onTagOrDraft'"
   },
   "eslintConfig": {
     "extends": [
@@ -53,9 +55,10 @@
     "extraResources": "assets",
     "protocols": {
       "name": "hypera-protocol",
-      "schemes": [
-        "hypera"
-      ]
+      "schemes": ["hypera"]
+    },
+    "publish": {
+      "provider": "github"
     }
   }
 }
