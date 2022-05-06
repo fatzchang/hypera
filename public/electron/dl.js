@@ -53,7 +53,7 @@ const getScreenshot = (args) => {
     '-protocol_whitelist', 'file,http,https,tcp,tls,crypto',
     '-headers', headers,
     '-i', url,
-    '-ss', '10',
+    '-ss', '5',
     '-frames:v', '1' ,
     '-q:v', '2', 
     filename
