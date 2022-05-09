@@ -3,6 +3,7 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { handleDownload } = require('./dl');
 const { handleWebSocket } = require('./ws');
+const updater = require('./updater');
 
 machineId().then((id) => {
   // use this id to differentiate user
@@ -30,6 +31,9 @@ if (!gotTheLock) {
   
   
   const createWindow = () => {
+    // check for update
+    updater();
+
     mainWindow = new BrowserWindow({
       width: 1200,
       height: 800,
