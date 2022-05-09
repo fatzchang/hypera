@@ -54,6 +54,7 @@
   },
   "build": {
     "appId": "com.app.hypera",
+    "productName": "Hypera",
     "extraResources": "assets",
     "protocols": {
       "name": "hypera-protocol",
